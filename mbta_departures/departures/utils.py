@@ -7,9 +7,9 @@ def update_departures(departures):
     existing_trips = Departure.objects.all()
 
     # TODO: Needs some optimization
-    already_exist = [d for d in departures if d[2] in existing_trips]
+    already_exist = [d for d in departures if d[2] in existing_trips.values_list('trip', flat=True)]
     for dep in already_exist:
-        obj = Departure.objects.filter(trip=dep[2])
+        obj = Departure.objects.get(trip=dep[2])
         
         # TODO: Simplify?
         S = Departure
@@ -47,12 +47,12 @@ def update_departures(departures):
 
         obj.last_updated=timezone.datetime.fromtimestamp(int(dep[0]))
         obj.lateness=timezone.timedelta(seconds=int(dep[5]))
-        obj.track=dep[6]
+        obj.track=dep[6] or None
         obj.status=status
         obj.save()
 
     # Create new departures
-    new = [d for d in departures if d[2] not in existing_trips]
+    new = [d for d in departures if d[2] not in existing_trips.values_list('trip', flat=True)]
     for dep in new:
         # TODO: Simplify
         S = Departure

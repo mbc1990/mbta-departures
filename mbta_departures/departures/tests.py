@@ -48,6 +48,7 @@ class UpdateDeparturesTests(TestCase):
         self.assertEqual(Departure.objects.count(), 36) 
 
     def test_update_departures(self):
+        update_departures(self.basic_response)
         update_departures([['1471984922', 'South Station', '523', 'Worcester / Union Station', '1471988400', '100', '', 'Delayed']])
         dep = Departure.objects.get(trip=523)
         self.assertEqual(dep.status, dep.STATUS_DELAYED)
