@@ -12,6 +12,8 @@ class Departure(models.Model):
     origin = models.CharField(null=False, max_length=128)
     
     # trip number
+    # TODO: Consider adding an index to this field for prod db 
+    # TODO: Also consider not using CharField for prod
     trip = models.CharField(null=False, max_length=128)
 
     # destination (string)
@@ -24,7 +26,7 @@ class Departure(models.Model):
     lateness = models.DurationField(null=False)
 
     # track (int)
-    track = models.IntegerField(null=False)
+    track = models.IntegerField(null=True)
 
     # status 
     STATUS_ON_TIME = 1

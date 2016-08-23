@@ -14,9 +14,9 @@ def fetch_departure_data():
     if res.status_code == 200:
         f = StringIO.StringIO(res.content)
         reader = csv.reader(f, delimiter=',')
-
         # Truncate first row (contains field definitions)
         rows = list(reader)[1:]
         update_departures(rows)
     else:
+        # TODO: Logging
         pass
