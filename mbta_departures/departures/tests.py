@@ -1,11 +1,12 @@
 from django.test import TestCase
+from django.utils import timezone
 from utils import update_departures
 from models import Departure
 
 class UpdateDeparturesTests(TestCase):
 
-    def test_update_departures(self):
-        cleaned_api_response = [['1471984921', 'North Station', '193', 'Beverly', '1471984800', '0', '2', 'Departed'],
+    def setUp(self):
+        self.basic_response = [['1471984921', 'North Station', '193', 'Beverly', '1471984800', '0', '2', 'Departed'],
             ['1471984921', 'North Station', '329', 'Lowell', '1471985100', '0', '8', 'Now Boarding'],
             ['1471984921', 'North Station', '293', 'Reading', '1471985280', '0', '4', 'Now Boarding'],
             ['1471984921', 'North Station', '117', 'Rockport', '1471986000', '0', '', 'On Time'],
@@ -41,6 +42,13 @@ class UpdateDeparturesTests(TestCase):
             ['1471984921', 'South Station', '047', 'Kingston', '1471988280', '0', '', 'On Time'],
             ['1471984921', 'South Station', '825', 'Wickford Junction', '1471988400', '0', '', 'On Time'],
             ['1471984921', 'South Station', '523', 'Worcester / Union Station', '1471988400', '0', '', 'On Time']]
-        
-        update_departures(cleaned_api_response)
+
+    def test_create_departures(self):
+        update_departures(self.basic_response)
         self.assertEqual(Departure.objects.count(), 36) 
+
+    def test_update_departures(self):
+        update_departures([['1471984922', 'South Station', '523', 'Worcester / Union Station', '1471988400', '100', '', 'Delayed']])
+        dep = Departure.objects.get(trip=523)
+        self.assertEqual(dep.status, dep.STATUS_DELAYED)
+        self.assertEqual(dep.lateness, timezone.timedelta(seconds=100))
