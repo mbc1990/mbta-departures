@@ -53,6 +53,13 @@ coverage.xml
 *.log
 local_settings.py
 
+# Vim stuff
+*.swp
+*.swo
+
+# Sqlite3
+*.sqlite3
+
 # Flask stuff:
 instance/
 .webassets-cache
