@@ -6,6 +6,9 @@ class UnexpectedStatusException(Exception):
     pass
 
 def status_map(api_status):
+    '''
+        Translate API responses into status enum values
+    '''
     S = Departure
     if api_status == "On Time":
         status = S.STATUS_ON_TIME

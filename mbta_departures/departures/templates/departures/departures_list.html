@@ -3,7 +3,6 @@
         MBTA Departures
     </title>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     <script src="https://use.fontawesome.com/5f5c2f0c6d.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -17,7 +16,7 @@
                 self.POLLING_FREQUENCY = 30; 
 
                 self.departures = ko.observableArray();
-                self.showConnectionError = ko.observable(false); // TODO: UI
+                self.showConnectionError = ko.observable(true); 
 
                 self.updateFromData(departures);
                 self.pollForUpdates();
@@ -61,10 +60,14 @@
             <div class="col-md-12">
                 <h1>MBTA Departures <i class="fa fa-train" aria-hidden="true"></i></h1>
             </div>
+            
             <div class="col-md-2">
             </div>
             <div class="col-md-8">
-                <table style="width:100%">
+                <div data-bind="visible:showConnectionError" class="alert alert-danger" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Unable to connect to server. Please check your internet connection.
+                </div>
+                <table data-bind="style:{color: showConnectionError() ? '#e6e6e6' : 'black'}" style="width:100%;">
                     <thead>
                         <tr>
                             <th>
