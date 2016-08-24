@@ -16,6 +16,7 @@
                 self.POLLING_FREQUENCY = 30; 
 
                 self.departures = ko.observableArray();
+                self.station = ko.observable('South Station');
                 self.showConnectionError = ko.observable(true); 
                 self.clock = ko.observable(moment().format('h:mm:ss a'));
                 self.date = ko.observable(moment().format('MMMM Do YYYY'));
@@ -86,6 +87,15 @@
         </div>
         <hr></hr>
         <div class="row">
+            <div class="col-md-6">
+                <button data-bind="click:function(){station('North Station')}, css:{'btn-primary':station() == 'North Station'}" class="btn btn-block">North Station</button>
+            </div>
+            <div class="col-md-6">
+                <button data-bind="click:function(){station('South Station')}, css:{'btn-primary':station() == 'South Station'}" class="btn btn-block">South Station</button>
+            </div>
+        </div>
+        <hr></hr>
+        <div class="row">
             <div class="col-md-1">
             </div>
             <div class="col-md-10">
@@ -96,9 +106,6 @@
                 <table class="table table-sm" data-bind="style:{color: showConnectionError() ? '#e6e6e6' : 'black'}" style="width:100%;">
                     <thead>
                         <tr>
-                            <th>
-                                Carrier
-                            </th>
                             <th>
                                 Departure Time
                             </th>
@@ -117,10 +124,7 @@
                         </tr>
                     </thead>
                     <tbody data-bind="foreach:departures">
-                        <tr data-bind="css:{'text-muted': $data.status=='Departed'}">                        
-                            <th>
-                                MBTA 
-                            </th>
+                        <tr data-bind="if:$data.origin==$parent.station(), css:{'text-muted': $data.status=='Departed'}">                        
                             <th>
                                 <span data-bind="text:$data.scheduled_time.format('h:mm a')"></span>
                             </th>
