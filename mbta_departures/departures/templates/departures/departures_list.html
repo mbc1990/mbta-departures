@@ -17,6 +17,12 @@
 
                 self.departures = ko.observableArray();
                 self.showConnectionError = ko.observable(true); 
+                self.clock = ko.observable(moment().format('h:mm:ss a'));
+                self.date = ko.observable(moment().format('MMMM Do YYYY'));
+                setInterval(function() {
+                    self.clock(moment().format('h:mm:ss a'));
+                    self.date(moment().format('MMMM Do YYYY'));
+                }, 999);
 
                 self.updateFromData(departures);
                 self.pollForUpdates();
@@ -57,17 +63,28 @@
 <body>
     <div class="container">
         <div class="row">
-            <div class="col-md-12">
-                <h1>MBTA Departures <i class="fa fa-train" aria-hidden="true"></i></h1>
+            <div class="col-md-4">
+                <h1>Departures <i class="fa fa-train" aria-hidden="true"></i></h1>
             </div>
-            
-            <div class="col-md-2">
+            <div class="col-md-4">
+                <h1 class="text-center" data-bind="text:clock">
+                </h1>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-4">
+               <h1 class="text-right" data-bind="text:date">
+               </h1>
+            </div>
+        </div>
+        <hr></hr>
+        <div class="row">
+            <div class="col-md-1">
+            </div>
+            <div class="col-md-10">
                 <div data-bind="visible:showConnectionError" class="alert alert-danger" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Unable to connect to server. Please check your internet connection.
                 </div>
-                <table data-bind="style:{color: showConnectionError() ? '#e6e6e6' : 'black'}" style="width:100%;">
+
+                <table class="table table-sm" data-bind="style:{color: showConnectionError() ? '#e6e6e6' : 'black'}" style="width:100%;">
                     <thead>
                         <tr>
                             <th>
@@ -114,7 +131,17 @@
                     </tbody>
                 </table>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
+            </div>
+        </div>
+        <hr></hr>
+        <div class="row">
+            <div class="col-md-1">
+            </div>
+            <div class="col-md-10">
+                © 2016 Malcolm Balch-Crystal
+            </div>
+            <div class="col-md-1">
             </div>
         </div>
     </div>
