@@ -12,8 +12,7 @@ class Departure(models.Model):
     origin = models.CharField(null=False, max_length=128)
     
     # trip number
-    # TODO: Consider adding an index to this field for prod db 
-    # TODO: Also consider not using CharField for prod
+    # This is a CharField because one of the examples has a trip number like "P109", but I haven't seen the API return that
     trip = models.CharField(null=False, max_length=128)
 
     # destination (string)
