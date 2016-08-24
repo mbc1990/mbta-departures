@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.utils import timezone
-from utils import update_departures
+from utils import update_departures, UnexpectedStatusException
 from models import Departure
 
 class UpdateDeparturesTests(TestCase):
@@ -49,7 +49,19 @@ class UpdateDeparturesTests(TestCase):
 
     def test_update_departures(self):
         update_departures(self.basic_response)
+        dep = Departure.objects.get(trip=523)
+        self.assertEqual(dep.status, dep.STATUS_ON_TIME)
         update_departures([['1471984922', 'South Station', '523', 'Worcester / Union Station', '1471988400', '100', '', 'Delayed']])
         dep = Departure.objects.get(trip=523)
         self.assertEqual(dep.status, dep.STATUS_DELAYED)
         self.assertEqual(dep.lateness, timezone.timedelta(seconds=100))
+
+    def test_deactivate(self):
+        update_departures(self.basic_response)
+        self.assertEqual(Departure.objects.filter(active=True).count(), 36)
+        update_departures(self.basic_response[:10])
+        self.assertEqual(Departure.objects.filter(active=True).count(), 10)
+
+    def test_bad_status(self):
+        with self.assertRaises(UnexpectedStatusException):
+            update_departures([['1471984922', 'South Station', '523', 'Worcester / Union Station', '1471988400', '100', '', 'Derailed']])

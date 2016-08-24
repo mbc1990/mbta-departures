@@ -34,7 +34,6 @@ def status_map(api_status):
     elif api_status == "Hold":
         status = S.STATUS_HOLD
     else:
-        # TODO Test this exception 
         raise UnexpectedStatusException("Unexpected status from API: {0}".format(api_status))
     return status
 
