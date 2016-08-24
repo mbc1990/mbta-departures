@@ -13,22 +13,40 @@
         $(document).ready(function() {
             function DeparturesViewModel(departures) {
                 var self=this;
+                // Polling frequency in seconds 
+                self.POLLING_FREQUENCY = 30; 
+
+                self.departures = ko.observableArray();
+                self.showConnectionError = ko.observable(false); // TODO: UI
+
+                self.updateFromData(departures);
+                self.pollForUpdates();
+            }
+
+            DeparturesViewModel.prototype.updateFromData = function(departures) {
+                var self=this;
                 departures = departures.map(function(dep) {
                     dep.scheduled_time = moment(dep.scheduled_time);
                     return dep;
                 });
-                self.departures = ko.observableArray(departures);
+                self.departures(departures);
+            };
 
-                // Polling frequency in seconds 
-                self.POLLING_FREQUENCY = 30; 
-
-                console.log('departures: ',self.departures());
-            }
-
-            // TODO: 
             DeparturesViewModel.prototype.pollForUpdates = function() {
                 var self=this;
-            }
+                $.ajax({
+                    url: '/departures/poll_departures/',
+                }).done(function(data) {
+                    self.updateFromData(JSON.parse(data.departures));
+                    self.showConnectionError(false);
+                }).fail(function(data) {
+                    self.showConnectionError(true);
+                }).always(function() {
+                    setTimeout(function() {
+                        self.pollForUpdates();
+                    }, self.POLLING_FREQUENCY*1000);
+                });
+            };
 
             // The safe template tag prevents html escaping 
             // Let's assume a train will never go to a destination named after an XSS attack... 

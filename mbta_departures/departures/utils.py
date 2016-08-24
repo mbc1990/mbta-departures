@@ -6,6 +6,7 @@ class UnexpectedStatusException(Exception):
     pass
 
 def status_map(api_status):
+    S = Departure
     if api_status == "On Time":
         status = S.STATUS_ON_TIME
     elif api_status == "Cancelled":
@@ -39,47 +40,41 @@ def status_map(api_status):
 
 def update_departures(departures):
 
-    # Everything currently displayed 
-    existing_trips = Departure.objects.filter(active=True)
+    # Expire old departures
+    active_trip_ids = [d[2] for d in departures]
+    now_inactive = Departure.objects.filter(active=True).exclude(trip__in=active_trip_ids)
+    now_inactive.update(active=False)
 
-    # Expire trips that are no longer returned by the API 
-    newly_inactive = [d[2] for d in departures if d[2] in existing_trips.values_list('trip', flat=True)] 
-    newly_inactive.update(active=False)
-    
-    # Reflect altereted active status 
-    existing_trips.refresh_from_db()
+    # Figure out which entries are going to be updated and which need to be created
+    to_update = Departure.objects.filter(active=True, trip__in=active_trip_ids)
+    to_update_ids = to_update.values_list('trip', flat=True)
+    to_update_map = dict((el.trip, el) for el in list(to_update))
 
-    # TODO: Needs some optimization
-    already_exist = [d for d in departures if d[2] in existing_trips.values_list('trip', flat=True)]
-    for dep in already_exist:
-        obj = Departure.objects.get(trip=dep[2])
-        S = Departure
-        api_status = d[7]
+    # Iterate over the API response, updating and creating as necessary 
+    for dep in departures:
+        trip = dep[2]
+        api_status = dep[7]
         status = status_map(api_status)
-        obj.last_updated=timezone.datetime.fromtimestamp(int(dep[0]))
-        obj.lateness=timezone.timedelta(seconds=int(dep[5]))
-        obj.track=dep[6] or None
-        obj.status=status
-        obj.save()
+        if trip in to_update_map:
+            obj = to_update_map[trip]
+            obj.last_updated=timezone.datetime.fromtimestamp(int(dep[0]))
+            obj.lateness=timezone.timedelta(seconds=int(dep[5]))
+            obj.track=dep[6] or None
+            obj.status=status
+            obj.save()
+        else:
+            Departure.objects.create(
+                last_updated=timezone.datetime.fromtimestamp(int(dep[0])),
+                trip=dep[2],
+                origin=dep[1],
+                destination=dep[3],
+                scheduled_time= timezone.datetime.fromtimestamp(int(dep[4])),
+                lateness=timezone.timedelta(seconds=int(dep[5])),
+                track=dep[6] or None,
+                status=status,
+            )
 
-    # Create new departures
-    new = [d for d in departures if d[2] not in existing_trips.values_list('trip', flat=True)]
-    for dep in new:
-        # TODO: Simplify
-        S = Departure
-        api_status = d[7]
-        status = status_map(api_status)
-        Departure.objects.create(
-            last_updated=timezone.datetime.fromtimestamp(int(dep[0])),
-            trip=dep[2],
-            origin=dep[1],
-            destination=dep[3],
-            scheduled_time= timezone.datetime.fromtimestamp(int(dep[4])),
-            lateness=timezone.timedelta(seconds=int(dep[5])),
-            track=dep[6] or None,
-            status=status,
-        )
-
+# TODO: Caching layer, probably beyond the scope of this project... 
 def get_json_departures():
     current_departures = Departure.objects.filter(active=True)
     json_departures = []
