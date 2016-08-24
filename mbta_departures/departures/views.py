@@ -16,7 +16,7 @@ class DepartureListView(ListView):
         
         # TODO: When is a departure no longer needed?
         # Probably when the API stops sending it
-        current_departures = Departure.objects.all()
+        current_departures = Departure.objects.filter(active=True)
 
         json_departures = []
         for dep in current_departures:

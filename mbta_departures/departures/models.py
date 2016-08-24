@@ -7,6 +7,9 @@ from django.db import models
 class Departure(models.Model):
     # Last updated (timestamp)
     last_updated = models.DateTimeField()   
+    
+    # Whether or not this entry is still displayed to the user
+    active = models.BooleanField(default=True)
 
     # origin (enum)
     origin = models.CharField(null=False, max_length=128)
