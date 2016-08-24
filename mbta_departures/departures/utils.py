@@ -1,3 +1,4 @@
+import json
 from models import Departure
 from django.utils import timezone
 
@@ -35,8 +36,6 @@ def status_map(api_status):
         # TODO Test this exception 
         raise UnexpectedStatusException("Unexpected status from API: {0}".format(api_status))
     return status
-
-
 
 def update_departures(departures):
 
@@ -80,3 +79,18 @@ def update_departures(departures):
             track=dep[6] or None,
             status=status,
         )
+
+def get_json_departures():
+    current_departures = Departure.objects.filter(active=True)
+    json_departures = []
+    for dep in current_departures:
+        json_departures.append({
+            'origin': dep.origin,
+            'trip': dep.trip,
+            'destination': dep.destination,
+            'scheduled_time': dep.scheduled_time.isoformat(),
+            'lateness': dep.lateness.seconds,
+            'track': dep.track,
+            'status': dep.get_status_display()
+        })
+    return json.dumps(json_departures)
