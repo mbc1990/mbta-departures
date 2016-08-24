@@ -117,7 +117,7 @@
                         </tr>
                     </thead>
                     <tbody data-bind="foreach:departures">
-                        <tr>                        
+                        <tr data-bind="css:{'text-muted': $data.status=='Departed'}">                        
                             <th>
                                 MBTA 
                             </th>
@@ -133,7 +133,7 @@
                             <th>
                                 <span data-bind="text:$data.track"></span>
                             </th>
-                            <th>
+                            <th data-bind="style:{'color': $data.status=='Now Boarding' ? 'green' : 'inherit'}">
                                 <span data-bind="text:$data.status"></span>
                             </th>
                         </tr>
