@@ -5,32 +5,33 @@ from django.db import models
 # Create your models here.
 
 class Departure(models.Model):
-    # Last updated (timestamp)
+
+    # Last time this trip was updated 
     last_updated = models.DateTimeField()   
     
     # Whether or not this entry is still displayed to the user
     active = models.BooleanField(default=True)
 
-    # origin (enum)
+    # Origin
     origin = models.CharField(null=False, max_length=128)
     
-    # trip number
+    # Trip number
     # This is a CharField because one of the examples has a trip number like "P109", but I haven't seen the API return that
     trip = models.CharField(null=False, max_length=128)
 
-    # destination (string)
+    # Destination 
     destination = models.CharField(null=False, max_length=256)
 
-    # scheduled_timed (timestmap)
+    # Scheduled time
     scheduled_time = models.DateTimeField(null=False)
 
-    # lateness (interval)
+    # Lateness 
     lateness = models.DurationField(null=False)
 
-    # track (int)
+    # Track #
     track = models.IntegerField(null=True)
 
-    # status 
+    # Status 
     STATUS_ON_TIME = 1
     STATUS_CANCELLED = 2
     STATUS_ARRIVING = 3
@@ -44,6 +45,8 @@ class Departure(models.Model):
     STATUS_DELAYED = 11
     STATUS_LATE = 12
     STATUS_HOLD = 13
+
+    # These specify how statuses are described to the end user, they don't necessarily need to match the API responses 
     STATUS_CHOICES = (
         (STATUS_ON_TIME, "On Time"),
         (STATUS_CANCELLED, "Cancelled"),

@@ -7,7 +7,7 @@ class UnexpectedStatusException(Exception):
 
 def status_map(api_status):
     '''
-        Translate API responses into status enum values
+    Translate API responses into status enum values
     '''
     S = Departure
     if api_status == "On Time":
@@ -76,7 +76,7 @@ def update_departures(departures):
                 status=status,
             )
 
-# TODO: Caching layer, probably beyond the scope of this project... 
+# TODO: Caching layer via redis, probably beyond the scope of this project... 
 def get_json_departures():
     current_departures = Departure.objects.filter(active=True)
     json_departures = []
