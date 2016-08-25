@@ -33,6 +33,12 @@
                 var self=this;
                 departures = departures.map(function(dep) {
                     dep.scheduled_time = moment(dep.scheduled_time);
+
+                    var hours = Math.floor(dep.lateness / 3600);
+                    var minutes = Math.floor((dep.lateness % 3600) / 60);
+                    var seconds = dep.lateness %  60;
+
+                    dep.formattedLateness = hours+':'+minutes+':'+seconds;
                     return dep;
                 });
                 self.departures(departures);
@@ -127,6 +133,9 @@
                         <tr data-bind="if:$data.origin==$parent.station(), css:{'text-muted': $data.status=='Departed'}">                        
                             <th>
                                 <span data-bind="text:$data.scheduled_time.format('h:mm a')"></span>
+                                <span data-bind="if:$data.lateness > 0">
+                                    (+<span data-bind="text:$data.formattedLateness"></span>)
+                                </span>
                             </th>
                             <th>
                                 <span data-bind="text:$data.destination"></span>
