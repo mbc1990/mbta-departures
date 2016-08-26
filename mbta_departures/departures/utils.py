@@ -59,6 +59,7 @@ def update_departures(departures):
         status = status_map(api_status)
         if trip in to_update_map:
             obj = to_update_map[trip]
+            obj.scheduled_time=timezone.datetime.fromtimestamp(int(dep[4]))
             obj.last_updated=timezone.datetime.fromtimestamp(int(dep[0]))
             obj.lateness=timezone.timedelta(seconds=int(dep[5]))
             obj.track=dep[6] or None
@@ -70,7 +71,7 @@ def update_departures(departures):
                 trip=dep[2],
                 origin=dep[1],
                 destination=dep[3],
-                scheduled_time= timezone.datetime.fromtimestamp(int(dep[4])),
+                scheduled_time=timezone.datetime.fromtimestamp(int(dep[4])),
                 lateness=timezone.timedelta(seconds=int(dep[5])),
                 track=dep[6] or None,
                 status=status,
